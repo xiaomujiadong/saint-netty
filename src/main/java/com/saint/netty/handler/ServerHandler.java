@@ -10,15 +10,15 @@ import io.netty.util.CharsetUtil;
 public class ServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object evt) throws Exception {
-        ByteBuf in = (ByteBuf)evt;
-
-        System.out.println("Server receiver: "+in.toString(CharsetUtil.UTF_8));
-        ctx.write(in);
+//        ByteBuf in = (ByteBuf)evt;
+//        System.out.println("Server receiver: "+in.toString(CharsetUtil.UTF_8));
+//        ctx.write(in);
+//        ctx.channel();
     }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
+//        ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
     }
 
     @Override

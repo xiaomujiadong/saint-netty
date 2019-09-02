@@ -1,6 +1,7 @@
 package com.saint.netty.init;
 
 import com.saint.netty.handler.ServerHandler;
+import com.saint.netty.handler.UserConnectionHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
@@ -175,7 +176,8 @@ public class TcpServerInit {
      */
     private void initPipeline(ChannelPipeline pipeline) {
 //        pipeline.addLast("socketChoose", new SocketChooseDecoder());
-        pipeline.addLast("serverHandler", new ServerHandler());
+//        pipeline.addLast("serverHandler", new ServerHandler());
+        pipeline.addLast("userHandler", new UserConnectionHandler());
     }
 
     @Data

@@ -42,11 +42,11 @@ public class UserConnectionHandler extends ChannelInboundHandlerAdapter {
         }
         if(StringUtils.isNotBlank(otherUserId)){
             Channel otherChannel = ConnectionUtil.getChannel(otherUserId);
-            if(value.split("#").length==2){
+            if(value.split("#").length==2 && otherChannel!=null){
                 otherChannel.writeAndFlush(Unpooled.copiedBuffer(value.split("#")[1], CharsetUtil.UTF_8));
             }
         }
-        ctx.write(in);
+//        ctx.write(in);
     }
 
     @Override

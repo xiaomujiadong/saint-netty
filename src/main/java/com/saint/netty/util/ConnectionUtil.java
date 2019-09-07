@@ -10,17 +10,17 @@ import java.util.Map;
  */
 public class ConnectionUtil {
 
-    private static final Map<String, Channel> mapChannel = new HashMap<>();
+    private static final Map<Long, Channel> mapChannel = new HashMap<>();
 
-    public static Channel getChannel(String userId){
+    public static Channel getChannel(Long userId){
         return mapChannel.get(userId);
     }
 
-    public static void addChannel(String userId, Channel channel){
+    public static void addChannel(Long userId, Channel channel){
         mapChannel.put(userId, channel);
     }
 
-    public static Map<String, Channel> getChannelMap(){
+    public static Map<Long, Channel> getChannelMap(){
         return mapChannel;
     }
 }

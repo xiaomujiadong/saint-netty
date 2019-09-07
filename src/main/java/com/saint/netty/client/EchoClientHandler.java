@@ -1,5 +1,6 @@
 package com.saint.netty.client;
 
+import com.saint.netty.params.RespMsg.NettyRespMsg;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,7 +16,11 @@ public class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) throws Exception {
-        System.out.println(byteBuf.toString(CharsetUtil.UTF_8));
+        int length = byteBuf.readableBytes();
+        byte[] array = new byte[length];
+        byteBuf.getBytes(byteBuf.readerIndex(), array);
+        NettyRespMsg respMsg = NettyRespMsg.parseFrom(array);
+        System.out.println("客户端收到的回复为： "+respMsg.toString());
 //        channelHandlerContext.write(byteBuf);
     }
 

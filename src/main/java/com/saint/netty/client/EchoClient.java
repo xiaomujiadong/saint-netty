@@ -1,5 +1,7 @@
 package com.saint.netty.client;
 
+import com.saint.netty.params.Msg;
+import com.saint.netty.params.Msg.NettyMsg;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -33,19 +35,26 @@ public class EchoClient {
         Scanner scan = new Scanner(System.in);
         // next方式接收字符串
         System.out.println("next方式接收：");
+        int userId = 111;
+        int toUserId = 222;
+        Msg.NettyMsg msg = NettyMsg.newBuilder().setMsgId(1).setUserId(userId).setContent("测试").setToUserId(toUserId).build();
+        NettyClient client = new NettyClient();
+        client.connect(url, port);
+        channel = client.getChannel();
+        channel.writeAndFlush(msg);
+//        System.out.println(Unpooled.copiedBuffer(msg.toByteArray()).readableBytes());
         while (scan.hasNext()){
             if(channel==null){
-                NettyClient client = new NettyClient();
                 client.connect(url, port);
                 channel = client.getChannel();
-                channel.writeAndFlush(Unpooled.copiedBuffer("HELLO Test", CharsetUtil.UTF_8));
+                channel.writeAndFlush(Unpooled.copiedBuffer(msg.toByteArray()));
             }
 
             String str1 = scan.next();
             System.out.println(channel.isActive()+"输入的数据为：" + str1);
-            channel.writeAndFlush(Unpooled.copiedBuffer(str1, CharsetUtil.UTF_8));
+            Msg.NettyMsg msg2 = NettyMsg.newBuilder().setMsgId(1).setUserId(userId).setContent(str1).setToUserId(toUserId).build();
+            channel.writeAndFlush(msg2);
             channel.flush();
-
         }
         scan.close();
         channel.closeFuture().sync();

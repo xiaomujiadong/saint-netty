@@ -32,10 +32,10 @@ public class UserConnectionHandler extends ChannelInboundHandlerAdapter {
             if(toChannel==null){
                 respMsg.toBuilder().setContent("消息接收成功，但是对方不在线");
             }else{
-                toChannel.writeAndFlush(Unpooled.copiedBuffer(msg.toByteArray()));
+                toChannel.writeAndFlush(respMsg);
             }
         }
-        ctx.write(respMsg.toByteArray());
+        ctx.write(respMsg);
     }
 
     @Override

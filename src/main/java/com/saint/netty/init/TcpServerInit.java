@@ -2,6 +2,8 @@ package com.saint.netty.init;
 
 import com.saint.netty.handler.ServerHandler;
 import com.saint.netty.handler.UserConnectionHandler;
+import com.saint.netty.params.Msg;
+import com.saint.netty.params.RespMsg;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
@@ -13,6 +15,9 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.protobuf.ProtobufDecoder;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.Map;
@@ -177,6 +182,9 @@ public class TcpServerInit {
     private void initPipeline(ChannelPipeline pipeline) {
 //        pipeline.addLast("socketChoose", new SocketChooseDecoder());
 //        pipeline.addLast("serverHandler", new ServerHandler());
+        pipeline.addLast(new ProtobufVarint32FrameDecoder());
+        pipeline.addLast("decoder", new ProtobufDecoder(Msg.NettyMsg.getDefaultInstance()));
+        pipeline.addLast("encoder", new ProtobufEncoder());
         pipeline.addLast("userHandler", new UserConnectionHandler());
     }
 

@@ -2,21 +2,17 @@ package com.saint.netty.client;
 
 import com.saint.netty.params.Msg;
 import com.saint.netty.params.Msg.NettyMsg;
-import com.saint.netty.params.RespMsg;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
-import io.netty.util.CharsetUtil;
 import java.net.InetSocketAddress;
 import java.util.Scanner;
 import lombok.Data;
@@ -41,26 +37,22 @@ public class EchoClient {
         System.out.println("next方式接收：");
         int userId = 111;
         int toUserId = 222;
+//        int userId = 222;
+//        int toUserId = 111;
         Msg.NettyMsg msg = Msg.NettyMsg.newBuilder().setMsgId(1).setUserId(userId).setContent("测试").setToUserId(toUserId).build();
         NettyClient client = new NettyClient();
         client.connect(url, port);
         channel = client.getChannel();
         channel.writeAndFlush(msg);
-//        System.out.println(Unpooled.copiedBuffer(msg.toByteArray()).readableBytes());
-//        while (scan.hasNext()){
-//            if(channel==null){
-//                client.connect(url, port);
-//                channel = client.getChannel();
-//                channel.writeAndFlush(Unpooled.copiedBuffer(msg.toByteArray()));
-//            }
-//
-//            String str1 = scan.next();
-//            System.out.println(channel.isActive()+"输入的数据为：" + str1);
-//            Msg.NettyMsg msg2 = NettyMsg.newBuilder().setMsgId(1).setUserId(userId).setContent(str1).setToUserId(toUserId).build();
-//            channel.writeAndFlush(msg2);
-//            channel.flush();
-//        }
-//        scan.close();
+        System.out.println(Unpooled.copiedBuffer(msg.toByteArray()).readableBytes());
+        while (scan.hasNext()){
+            String str1 = scan.next();
+            System.out.println(channel.isActive()+"输入的数据为：" + str1);
+            Msg.NettyMsg msg2 = NettyMsg.newBuilder().setMsgId(1).setUserId(userId).setContent(str1).setToUserId(toUserId).build();
+            channel.writeAndFlush(msg2);
+            channel.flush();
+        }
+        scan.close();
         channel.closeFuture().sync();
     }
 }
@@ -75,10 +67,12 @@ class NettyClient{
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(group)
                     .channel(NioSocketChannel.class)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
                     .remoteAddress(new InetSocketAddress(url, port))
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
+                            socketChannel.pipeline().addLast(new ProtobufVarint32FrameDecoder());
                             socketChannel.pipeline().addLast("decoder", new ProtobufDecoder(Msg.NettyMsg.getDefaultInstance()));
                             socketChannel.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
                             socketChannel.pipeline().addLast("encoder", new ProtobufEncoder());

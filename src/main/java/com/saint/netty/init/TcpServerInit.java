@@ -18,6 +18,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.Map;
@@ -88,10 +89,11 @@ public class TcpServerInit {
              * 如果忘记在处理程序中释放缓冲区，那么内存使用率会无限地增长。
              * Netty默认不使用内存池，需要在创建客户端或者服务端的时候进行指定
              */
-            serverBootstrap.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
+//            serverBootstrap.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
 //            serverBootstrap.option(ChannelOption.SO_BACKLOG, nettyProp.getTcp().getSo().getBacklog());
-            serverBootstrap.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
-            serverBootstrap.childOption(ChannelOption.TCP_NODELAY, true);
+//            serverBootstrap.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
+//            serverBootstrap.childOption(ChannelOption.TCP_NODELAY, true);
+            serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
 //            if (nettyProp.getTcp().getSendBuf().getConnectServer() > 0) {
 //                serverBootstrap.option(ChannelOption.SO_SNDBUF, nettyProp.getTcp().getSendBuf().getConnectServer());
 //            }
@@ -180,10 +182,9 @@ public class TcpServerInit {
      * @return void
      */
     private void initPipeline(ChannelPipeline pipeline) {
-//        pipeline.addLast("socketChoose", new SocketChooseDecoder());
-//        pipeline.addLast("serverHandler", new ServerHandler());
         pipeline.addLast(new ProtobufVarint32FrameDecoder());
         pipeline.addLast("decoder", new ProtobufDecoder(Msg.NettyMsg.getDefaultInstance()));
+        pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
         pipeline.addLast("encoder", new ProtobufEncoder());
         pipeline.addLast("userHandler", new UserConnectionHandler());
     }

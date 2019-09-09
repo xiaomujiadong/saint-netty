@@ -43,18 +43,9 @@ public class EchoClient {
         int userId = 222;
         int toUserId = 111;
 
-
-        ChatEntityInfo chatEntityInfo = ChatEntityInfo.builder().userId(userId).build();
-        Msg.NettyMsg msg = Msg.NettyMsg.newBuilder()
-                .setMsgId(1)
-                .setMsgType(MsgTypeEnum.CONNECTION_MSG_TYPE.getMsgType())
-                .setContent(JSONObject.toJSONString(chatEntityInfo))
-                .build();
-
         NettyClient client = new NettyClient();
-        client.connect(url, port);
+        client.connect(url, port, userId);
         channel = client.getChannel();
-        channel.writeAndFlush(msg);
         while (scan.hasNext()){
             String str1 = scan.next();
             System.out.println(channel.isActive()+"输入的数据为：" + str1);
@@ -73,7 +64,7 @@ class NettyClient{
 
     private Channel channel;
 
-    public void connect(String url, int port) {
+    public void connect(String url, int port, int userId) {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap();
@@ -93,6 +84,14 @@ class NettyClient{
                     });
             ChannelFuture channelFuture = bootstrap.connect().sync();
             this.channel = channelFuture.channel();
+            ChatEntityInfo chatEntityInfo = ChatEntityInfo.builder().userId(userId).build();
+            Msg.NettyMsg msg = Msg.NettyMsg.newBuilder()
+                    .setMsgId(1)
+                    .setMsgType(MsgTypeEnum.CONNECTION_MSG_TYPE.getMsgType())
+                    .setContent(JSONObject.toJSONString(chatEntityInfo))
+                    .build();
+            channelFuture.channel().writeAndFlush(msg);
+
 //            channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();

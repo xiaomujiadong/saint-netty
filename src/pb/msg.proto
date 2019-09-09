@@ -2,7 +2,6 @@ syntax = "proto3";
 
 message NettyMsg{
 	int32 msgId=1;
-	int64 userId=2;
-	int64 toUserId=3
-	string content=4;
+	int32 msgType=2;
+	string content=3;
 }

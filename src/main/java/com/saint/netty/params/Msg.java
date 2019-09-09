@@ -22,21 +22,16 @@ public final class Msg {
     int getMsgId();
 
     /**
-     * <code>optional int64 userId = 2;</code>
+     * <code>optional int32 msgType = 2;</code>
      */
-    long getUserId();
+    int getMsgType();
 
     /**
-     * <code>optional int64 toUserId = 3;</code>
-     */
-    long getToUserId();
-
-    /**
-     * <code>optional string content = 4;</code>
+     * <code>optional string content = 3;</code>
      */
     String getContent();
     /**
-     * <code>optional string content = 4;</code>
+     * <code>optional string content = 3;</code>
      */
     com.google.protobuf.ByteString
         getContentBytes();
@@ -54,8 +49,7 @@ public final class Msg {
     }
     private NettyMsg() {
       msgId_ = 0;
-      userId_ = 0L;
-      toUserId_ = 0L;
+      msgType_ = 0;
       content_ = "";
     }
 
@@ -91,15 +85,10 @@ public final class Msg {
             }
             case 16: {
 
-              userId_ = input.readInt64();
+              msgType_ = input.readInt32();
               break;
             }
-            case 24: {
-
-              toUserId_ = input.readInt64();
-              break;
-            }
-            case 34: {
+            case 26: {
               String s = input.readStringRequireUtf8();
 
               content_ = s;
@@ -137,28 +126,19 @@ public final class Msg {
       return msgId_;
     }
 
-    public static final int USERID_FIELD_NUMBER = 2;
-    private long userId_;
+    public static final int MSGTYPE_FIELD_NUMBER = 2;
+    private int msgType_;
     /**
-     * <code>optional int64 userId = 2;</code>
+     * <code>optional int32 msgType = 2;</code>
      */
-    public long getUserId() {
-      return userId_;
+    public int getMsgType() {
+      return msgType_;
     }
 
-    public static final int TOUSERID_FIELD_NUMBER = 3;
-    private long toUserId_;
-    /**
-     * <code>optional int64 toUserId = 3;</code>
-     */
-    public long getToUserId() {
-      return toUserId_;
-    }
-
-    public static final int CONTENT_FIELD_NUMBER = 4;
+    public static final int CONTENT_FIELD_NUMBER = 3;
     private volatile Object content_;
     /**
-     * <code>optional string content = 4;</code>
+     * <code>optional string content = 3;</code>
      */
     public String getContent() {
       Object ref = content_;
@@ -173,7 +153,7 @@ public final class Msg {
       }
     }
     /**
-     * <code>optional string content = 4;</code>
+     * <code>optional string content = 3;</code>
      */
     public com.google.protobuf.ByteString
         getContentBytes() {
@@ -204,14 +184,11 @@ public final class Msg {
       if (msgId_ != 0) {
         output.writeInt32(1, msgId_);
       }
-      if (userId_ != 0L) {
-        output.writeInt64(2, userId_);
-      }
-      if (toUserId_ != 0L) {
-        output.writeInt64(3, toUserId_);
+      if (msgType_ != 0) {
+        output.writeInt32(2, msgType_);
       }
       if (!getContentBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, content_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, content_);
       }
     }
 
@@ -224,16 +201,12 @@ public final class Msg {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(1, msgId_);
       }
-      if (userId_ != 0L) {
+      if (msgType_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(2, userId_);
-      }
-      if (toUserId_ != 0L) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(3, toUserId_);
+          .computeInt32Size(2, msgType_);
       }
       if (!getContentBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, content_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, content_);
       }
       memoizedSize = size;
       return size;
@@ -253,10 +226,8 @@ public final class Msg {
       boolean result = true;
       result = result && (getMsgId()
           == other.getMsgId());
-      result = result && (getUserId()
-          == other.getUserId());
-      result = result && (getToUserId()
-          == other.getToUserId());
+      result = result && (getMsgType()
+          == other.getMsgType());
       result = result && getContent()
           .equals(other.getContent());
       return result;
@@ -271,12 +242,8 @@ public final class Msg {
       hash = (19 * hash) + getDescriptorForType().hashCode();
       hash = (37 * hash) + MSGID_FIELD_NUMBER;
       hash = (53 * hash) + getMsgId();
-      hash = (37 * hash) + USERID_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getUserId());
-      hash = (37 * hash) + TOUSERID_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getToUserId());
+      hash = (37 * hash) + MSGTYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getMsgType();
       hash = (37 * hash) + CONTENT_FIELD_NUMBER;
       hash = (53 * hash) + getContent().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -399,9 +366,7 @@ public final class Msg {
         super.clear();
         msgId_ = 0;
 
-        userId_ = 0L;
-
-        toUserId_ = 0L;
+        msgType_ = 0;
 
         content_ = "";
 
@@ -428,8 +393,7 @@ public final class Msg {
       public NettyMsg buildPartial() {
         NettyMsg result = new NettyMsg(this);
         result.msgId_ = msgId_;
-        result.userId_ = userId_;
-        result.toUserId_ = toUserId_;
+        result.msgType_ = msgType_;
         result.content_ = content_;
         onBuilt();
         return result;
@@ -475,11 +439,8 @@ public final class Msg {
         if (other.getMsgId() != 0) {
           setMsgId(other.getMsgId());
         }
-        if (other.getUserId() != 0L) {
-          setUserId(other.getUserId());
-        }
-        if (other.getToUserId() != 0L) {
-          setToUserId(other.getToUserId());
+        if (other.getMsgType() != 0) {
+          setMsgType(other.getMsgType());
         }
         if (!other.getContent().isEmpty()) {
           content_ = other.content_;
@@ -537,61 +498,35 @@ public final class Msg {
         return this;
       }
 
-      private long userId_ ;
+      private int msgType_ ;
       /**
-       * <code>optional int64 userId = 2;</code>
+       * <code>optional int32 msgType = 2;</code>
        */
-      public long getUserId() {
-        return userId_;
+      public int getMsgType() {
+        return msgType_;
       }
       /**
-       * <code>optional int64 userId = 2;</code>
+       * <code>optional int32 msgType = 2;</code>
        */
-      public Builder setUserId(long value) {
+      public Builder setMsgType(int value) {
         
-        userId_ = value;
+        msgType_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int64 userId = 2;</code>
+       * <code>optional int32 msgType = 2;</code>
        */
-      public Builder clearUserId() {
+      public Builder clearMsgType() {
         
-        userId_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      private long toUserId_ ;
-      /**
-       * <code>optional int64 toUserId = 3;</code>
-       */
-      public long getToUserId() {
-        return toUserId_;
-      }
-      /**
-       * <code>optional int64 toUserId = 3;</code>
-       */
-      public Builder setToUserId(long value) {
-        
-        toUserId_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional int64 toUserId = 3;</code>
-       */
-      public Builder clearToUserId() {
-        
-        toUserId_ = 0L;
+        msgType_ = 0;
         onChanged();
         return this;
       }
 
       private Object content_ = "";
       /**
-       * <code>optional string content = 4;</code>
+       * <code>optional string content = 3;</code>
        */
       public String getContent() {
         Object ref = content_;
@@ -606,7 +541,7 @@ public final class Msg {
         }
       }
       /**
-       * <code>optional string content = 4;</code>
+       * <code>optional string content = 3;</code>
        */
       public com.google.protobuf.ByteString
           getContentBytes() {
@@ -622,7 +557,7 @@ public final class Msg {
         }
       }
       /**
-       * <code>optional string content = 4;</code>
+       * <code>optional string content = 3;</code>
        */
       public Builder setContent(
           String value) {
@@ -635,7 +570,7 @@ public final class Msg {
         return this;
       }
       /**
-       * <code>optional string content = 4;</code>
+       * <code>optional string content = 3;</code>
        */
       public Builder clearContent() {
         
@@ -644,7 +579,7 @@ public final class Msg {
         return this;
       }
       /**
-       * <code>optional string content = 4;</code>
+       * <code>optional string content = 3;</code>
        */
       public Builder setContentBytes(
           com.google.protobuf.ByteString value) {
@@ -720,9 +655,8 @@ public final class Msg {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\tmsg.proto\"L\n\010NettyMsg\022\r\n\005msgId\030\001 \001(\005\022\016" +
-      "\n\006userId\030\002 \001(\003\022\020\n\010toUserId\030\003 \001(\003\022\017\n\007cont" +
-      "ent\030\004 \001(\tb\006proto3"
+      "\n\tmsg.proto\";\n\010NettyMsg\022\r\n\005msgId\030\001 \001(\005\022\017" +
+      "\n\007msgType\030\002 \001(\005\022\017\n\007content\030\003 \001(\tb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -741,7 +675,7 @@ public final class Msg {
     internal_static_NettyMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_NettyMsg_descriptor,
-        new String[] { "MsgId", "UserId", "ToUserId", "Content", });
+        new String[] { "MsgId", "MsgType", "Content", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-message NettyRespMsg{
-	int32 code=1;
-	string msg=2;
-	string content=3;
-}

@@ -1,18 +1,14 @@
 package com.saint.netty.init;
 
 import com.saint.netty.handler.ServerHandler;
-import com.saint.netty.handler.UserConnectionHandler;
 import com.saint.netty.params.Msg;
-import com.saint.netty.params.RespMsg;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
@@ -24,15 +20,11 @@ import java.nio.channels.spi.SelectorProvider;
 import java.util.Map;
 import java.util.concurrent.ThreadFactory;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 @Data
 public class TcpServerInit {
-
-//    @Autowired
-//    private NettyProp nettyProp;
 
     private volatile boolean inited;
 
@@ -186,7 +178,7 @@ public class TcpServerInit {
         pipeline.addLast("decoder", new ProtobufDecoder(Msg.NettyMsg.getDefaultInstance()));
         pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
         pipeline.addLast("encoder", new ProtobufEncoder());
-        pipeline.addLast("userHandler", new UserConnectionHandler());
+        pipeline.addLast("userHandler", new ServerHandler());
     }
 
     @Data

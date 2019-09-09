@@ -4,7 +4,7 @@ import com.saint.netty.params.Msg;
 
 public class Test {
     public static void main(String[] args){
-        Msg.NettyMsg nettyMsg = Msg.NettyMsg.newBuilder().setMsgId(10).setUserId(123).setContent("hello").build();
+        Msg.NettyMsg nettyMsg = Msg.NettyMsg.newBuilder().setMsgId(10).setMsgId(123).setContent("hello").build();
 
         byte[] data = nettyMsg.toByteArray();
         try{

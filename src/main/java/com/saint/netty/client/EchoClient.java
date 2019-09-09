@@ -1,5 +1,8 @@
 package com.saint.netty.client;
 
+import com.alibaba.fastjson.JSONObject;
+import com.saint.netty.constant.MsgTypeEnum;
+import com.saint.netty.entity.ChatEntityInfo;
 import com.saint.netty.params.Msg;
 import com.saint.netty.params.Msg.NettyMsg;
 import io.netty.bootstrap.Bootstrap;
@@ -35,20 +38,29 @@ public class EchoClient {
         Scanner scan = new Scanner(System.in);
         // next方式接收字符串
         System.out.println("next方式接收：");
-        int userId = 111;
-        int toUserId = 222;
-//        int userId = 222;
-//        int toUserId = 111;
-        Msg.NettyMsg msg = Msg.NettyMsg.newBuilder().setMsgId(1).setUserId(userId).setContent("测试").setToUserId(toUserId).build();
+//        int userId = 111;
+//        int toUserId = 222;
+        int userId = 222;
+        int toUserId = 111;
+
+
+        ChatEntityInfo chatEntityInfo = ChatEntityInfo.builder().userId(userId).build();
+        Msg.NettyMsg msg = Msg.NettyMsg.newBuilder()
+                .setMsgId(1)
+                .setMsgType(MsgTypeEnum.CONNECTION_MSG_TYPE.getMsgType())
+                .setContent(JSONObject.toJSONString(chatEntityInfo))
+                .build();
+
         NettyClient client = new NettyClient();
         client.connect(url, port);
         channel = client.getChannel();
         channel.writeAndFlush(msg);
-        System.out.println(Unpooled.copiedBuffer(msg.toByteArray()).readableBytes());
         while (scan.hasNext()){
             String str1 = scan.next();
             System.out.println(channel.isActive()+"输入的数据为：" + str1);
-            Msg.NettyMsg msg2 = NettyMsg.newBuilder().setMsgId(1).setUserId(userId).setContent(str1).setToUserId(toUserId).build();
+            ChatEntityInfo chatEntityInfoTemp = ChatEntityInfo.builder().userId(userId).toUserId(toUserId).content(str1).build();
+            Msg.NettyMsg msg2 = NettyMsg.newBuilder().setMsgId(1).setMsgType(MsgTypeEnum.CHAT_MSG_TYPE.getMsgType()).setContent(
+                    JSONObject.toJSONString(chatEntityInfoTemp)).build();
             channel.writeAndFlush(msg2);
             channel.flush();
         }

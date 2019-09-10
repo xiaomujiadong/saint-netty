@@ -2,7 +2,7 @@ package com.saint.netty.handler.process;
 
 import com.alibaba.fastjson.JSONObject;
 import com.saint.netty.annotation.MsgType;
-import com.saint.netty.constant.MsgTypeEnum;
+import com.saint.netty.constant.SaintNettyConstant;
 import com.saint.netty.entity.ChatEntityInfo;
 import com.saint.netty.entity.MsgReturn;
 import com.saint.netty.params.Msg;
@@ -14,7 +14,7 @@ import io.netty.channel.ChannelHandlerContext;
  * @description:
  * @date: 2019/9/9 20:05
  */
-@MsgType(msgType = 100)
+@MsgType(msgType = SaintNettyConstant.CHAT_MSG_TYPE)
 public class ChatHandler extends AbstractProcessMsg  {
 
     @Override
@@ -31,7 +31,7 @@ public class ChatHandler extends AbstractProcessMsg  {
 
         ctx.writeAndFlush(Msg.NettyMsg.newBuilder()
                 .setMsgId(msg.getMsgId())
-                .setMsgType(MsgTypeEnum.RESPONSE_MSG_TYPE.getMsgType())
+                .setMsgType(SaintNettyConstant.RESPONSE_MSG_TYPE)
                 .setContent(JSONObject.toJSONString(msgReturn)));
     }
 }

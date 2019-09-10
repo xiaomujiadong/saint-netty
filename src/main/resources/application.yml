@@ -3,3 +3,5 @@ spring:
     gcp:
       pubsub:
         enabled: false
+logging:
+  config: classpath:log4j2.xml

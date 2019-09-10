@@ -2,7 +2,7 @@ package com.saint.netty.handler.process;
 
 import com.alibaba.fastjson.JSONObject;
 import com.saint.netty.annotation.MsgType;
-import com.saint.netty.constant.MsgTypeEnum;
+import com.saint.netty.constant.SaintNettyConstant;
 import com.saint.netty.entity.ChatEntityInfo;
 import com.saint.netty.entity.MsgReturn;
 import com.saint.netty.params.Msg;
@@ -14,7 +14,7 @@ import io.netty.channel.ChannelHandlerContext;
  * @date: 2019/9/9 17:51
  */
 
-@MsgType(msgType = 1)
+@MsgType(msgType = SaintNettyConstant.CONNECTION_MSG_TYPE)
 public class ConnectionHandler extends AbstractProcessMsg {
 
     @Override
@@ -26,7 +26,7 @@ public class ConnectionHandler extends AbstractProcessMsg {
 
         ctx.writeAndFlush(Msg.NettyMsg.newBuilder()
                 .setMsgId(msg.getMsgId())
-                .setMsgType(MsgTypeEnum.RESPONSE_MSG_TYPE.getMsgType())
+                .setMsgType(SaintNettyConstant.RESPONSE_MSG_TYPE)
                 .setContent(JSONObject.toJSONString(msgReturn)));
     }
 }

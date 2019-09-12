@@ -8,6 +8,8 @@ import com.saint.netty.entity.MsgReturn;
 import com.saint.netty.params.Msg;
 import com.saint.netty.util.ConnectionUtil;
 import io.netty.channel.ChannelHandlerContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**msgType = 1,==>MsgTypeEnum.CONNECTION_MSG_TYPE
  * @description:
@@ -16,6 +18,10 @@ import io.netty.channel.ChannelHandlerContext;
 
 @MsgType(msgType = SaintNettyConstant.CONNECTION_MSG_TYPE)
 public class ConnectionHandler extends AbstractProcessMsg {
+
+    private static final Logger logger = LoggerFactory.getLogger(ConnectionHandler.class);
+
+    public static volatile int count = 0;
 
     @Override
     public void process(Msg.NettyMsg msg, ChannelHandlerContext ctx) {
@@ -28,5 +34,6 @@ public class ConnectionHandler extends AbstractProcessMsg {
                 .setMsgId(msg.getMsgId())
                 .setMsgType(SaintNettyConstant.RESPONSE_MSG_TYPE)
                 .setContent(JSONObject.toJSONString(msgReturn)));
+        logger.info("第 "+(count++)+ " 个链接建立");
     }
 }

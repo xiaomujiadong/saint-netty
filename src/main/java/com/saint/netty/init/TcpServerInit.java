@@ -15,10 +15,12 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.Map;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +39,7 @@ public class TcpServerInit {
             getSelectorProvider());
 //        bossLoopGroup.setIoRatio(nettyProp.getTcp().getBoss().getIoRatio());
 //        NioEventLoopGroup workerLoopGroup = new NioEventLoopGroup(nettyProp.getTcp().getWorker().getThreadNum(), getWorkThreadFactory(),
-        NioEventLoopGroup workerLoopGroup = new NioEventLoopGroup(0, getWorkThreadFactory(),
+        NioEventLoopGroup workerLoopGroup = new NioEventLoopGroup(16, getWorkThreadFactory(),
             getSelectorProvider());
 //        workerLoopGroup.setIoRatio(nettyProp.getTcp().getWorker().getIoRatio());
         try {
@@ -175,6 +177,7 @@ public class TcpServerInit {
      */
     private void initPipeline(ChannelPipeline pipeline) {
         pipeline.addLast(new ProtobufVarint32FrameDecoder());
+        pipeline.addLast("idle", new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
         pipeline.addLast("decoder", new ProtobufDecoder(Msg.NettyMsg.getDefaultInstance()));
         pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
         pipeline.addLast("encoder", new ProtobufEncoder());

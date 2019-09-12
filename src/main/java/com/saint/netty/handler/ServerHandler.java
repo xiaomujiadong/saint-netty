@@ -9,6 +9,8 @@ import com.saint.netty.params.Msg;
 import com.saint.netty.util.AnnotionManagerUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +19,21 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     public final static Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
     @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if(evt instanceof IdleStateEvent){
+            IdleState idleState = ((IdleStateEvent)evt).state();
+            if(idleState == IdleState.READER_IDLE){
+                logger.warn("通道不活跃，即将关闭");
+                ctx.channel().pipeline().close();
+            }
+        }else {
+            super.userEventTriggered(ctx, evt);
+        }
+    }
+
+    @Override
     public void channelRead(ChannelHandlerContext ctx, Object evt) throws Exception {
         Msg.NettyMsg msg = (Msg.NettyMsg)evt;
-
-        logger.info("测试日志---------------------");
 
         ctx.writeAndFlush(Msg.NettyMsg.newBuilder()
                 .setMsgId(msg.getMsgId())

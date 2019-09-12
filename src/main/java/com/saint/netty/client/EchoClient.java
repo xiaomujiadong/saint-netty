@@ -7,8 +7,12 @@ import com.saint.netty.params.Msg;
 import com.saint.netty.params.Msg.NettyMsg;
 import io.netty.channel.*;
 import java.util.Scanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EchoClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(EchoClient.class);
 
     private final String url;
     private final int port;
@@ -25,10 +29,26 @@ public class EchoClient {
         String url = "127.0.0.1";
 //        int userId = 111;
 //        int toUserId = 222;
-        int userId = 222;
-        int toUserId = 111;
-        EchoClient echoClient = new EchoClient(url, port);
-        echoClient.start(userId, toUserId);
+        for(int i=1;i<10000;i++){
+            int userId = i;
+            int toUserId = i+10000;
+            EchoClient echoClient = new EchoClient(url, port);
+            echoClient.start(userId, toUserId);
+            Thread thread = new Thread(){
+                @Override
+                public void run() {
+                    EchoClient echoClient = new EchoClient(url, port);
+                    try {
+                        echoClient.start(userId, toUserId);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            thread.start();
+        }
+
     }
 
     private void start(int userId, int toUserId) throws InterruptedException {
@@ -36,7 +56,7 @@ public class EchoClient {
         client.connect(url, port, userId);
         channel = client.getChannel();
         Scanner scan = new Scanner(System.in);
-
+        logger.info(userId+"开始连接");
         while (scan.hasNext()){
             String str1 = scan.next();
             System.out.println(channel.isActive()+"输入的数据为：" + str1);

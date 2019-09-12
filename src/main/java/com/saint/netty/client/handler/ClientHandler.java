@@ -6,8 +6,31 @@ import com.saint.netty.entity.ChatEntityInfo;
 import com.saint.netty.params.Msg;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
+import java.sql.Timestamp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClientHandler extends ChannelInboundHandlerAdapter {
+
+    public final static Logger logger = LoggerFactory.getLogger(ClientHandler.class);
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception{
+        if(evt instanceof IdleStateEvent){
+            IdleState idleState = ((IdleStateEvent)evt).state();
+            if(idleState == IdleState.WRITER_IDLE){
+                logger.info(ctx.channel().id()+"客户端发送心跳包");
+                ctx.writeAndFlush(Msg.NettyMsg.newBuilder()
+                        .setMsgId(1)
+                        .setMsgType(SaintNettyConstant.HEART_BEAT)
+                        .build());
+            }
+        }else {
+            super.userEventTriggered(ctx, evt);
+        }
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object evt) throws Exception {

@@ -8,6 +8,7 @@ import com.saint.netty.params.Msg;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -18,6 +19,8 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.HashedWheelTimer;
 import java.net.InetSocketAddress;
 import lombok.Data;
 
@@ -30,6 +33,8 @@ public class NettyClient{
 
     private Channel channel;
 
+    protected final HashedWheelTimer timer = new HashedWheelTimer();
+
     public void connect(String url, int port, int userId) {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
@@ -37,34 +42,44 @@ public class NettyClient{
             bootstrap.group(group)
                     .channel(NioSocketChannel.class)
                     .option(ChannelOption.SO_KEEPALIVE, true)
-                    .remoteAddress(new InetSocketAddress(url, port))
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new ProtobufVarint32FrameDecoder());
-                            socketChannel.pipeline().addLast("decoder", new ProtobufDecoder(Msg.NettyMsg.getDefaultInstance()));
-                            socketChannel.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
-                            socketChannel.pipeline().addLast("encoder", new ProtobufEncoder());
-                            socketChannel.pipeline().addLast(new ClientHandler());
-                        }
-                    });
-            ChannelFuture channelFuture = bootstrap.connect().sync();
-            this.channel = channelFuture.channel();
-            ChatEntityInfo chatEntityInfo = ChatEntityInfo.builder().userId(userId).build();
-            Msg.NettyMsg msg = Msg.NettyMsg.newBuilder()
-                    .setMsgId(1)
-                    .setMsgType(SaintNettyConstant.CONNECTION_MSG_TYPE)
-                    .setContent(JSONObject.toJSONString(chatEntityInfo))
-                    .build();
-            channelFuture.channel().writeAndFlush(msg);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-//            try {
-//                group.shutdownGracefully().sync();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
+                    .remoteAddress(new InetSocketAddress(url, port));
+
+            final ConnectionWatchdog connectionWatchdog = new ConnectionWatchdog(bootstrap, timer, url, port, true) {
+                @Override
+                public ChannelHandler[] handlers() {
+                    return new ChannelHandler[]{
+                            new IdleStateHandler(0, 4, 0),
+                            this,
+                            new ProtobufVarint32FrameDecoder(),
+                            new ProtobufDecoder(Msg.NettyMsg.getDefaultInstance()),
+                            new ProtobufVarint32LengthFieldPrepender(),
+                            new ProtobufEncoder(),
+                            new ClientHandler()
+                    };
+                }
+            };
+
+            ChannelFuture channelFuture;
+
+            synchronized (bootstrap){
+                bootstrap.handler(new ChannelInitializer<Channel>() {
+                    @Override
+                    protected void initChannel(Channel channel) throws Exception {
+                        channel.pipeline().addLast(connectionWatchdog.handlers());
+                    }
+                });
+                channelFuture = bootstrap.connect().sync();
+                this.channel = channelFuture.channel();
+                ChatEntityInfo chatEntityInfo = ChatEntityInfo.builder().userId(userId).build();
+                Msg.NettyMsg msg = Msg.NettyMsg.newBuilder()
+                        .setMsgId(1)
+                        .setMsgType(SaintNettyConstant.CONNECTION_MSG_TYPE)
+                        .setContent(JSONObject.toJSONString(chatEntityInfo))
+                        .build();
+                channelFuture.channel().writeAndFlush(msg);
+            }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
         }
     }
 }

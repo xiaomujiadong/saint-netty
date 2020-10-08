@@ -29,7 +29,7 @@ public class EchoClient {
         String url = "127.0.0.1";
 //        int userId = 111;
 //        int toUserId = 222;
-        for(int i=1;i<10000;i++){
+        for(int i=1;i<1;i++){
             int userId = i;
             int toUserId = i+10000;
             EchoClient echoClient = new EchoClient(url, port);

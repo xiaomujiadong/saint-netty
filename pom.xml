@@ -23,7 +23,7 @@
 		<netty.version>4.1.28.Final</netty.version>
 		<grpc.version>1.6.1</grpc.version>
 		<reflections.version>0.9.11</reflections.version>
-        <fastjson.version>1.2.60</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
 	</properties>
 
 	<dependencies>
